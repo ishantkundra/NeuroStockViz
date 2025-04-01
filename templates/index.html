@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Stock Correlation Network Visualization</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    body { font-family: sans-serif; }
+    .node { stroke: #fff; stroke-width: 1.5px; }
+    .link { stroke: #999; stroke-opacity: 0.6; }
+    .highlight { stroke: red; stroke-width: 3px; }
+    #controls { margin: 20px; }
+    /* Tooltip styling */
+    .tooltip {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 5px 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      pointer-events: none;
+      font-size: 12px;
+      color: #333;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    }
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="controls">
+    <label for="stockSelect">Select Stock: </label>
+    <select id="stockSelect">
+      <option value="">--None--</option>
+      <option value="AAPL">AAPL</option>
+      <option value="MSFT">MSFT</option>
+      <option value="GOOGL">GOOGL</option>
+      <option value="AMZN">AMZN</option>
+      <option value="JNJ">JNJ</option>
+      <option value="V">V</option>
+      <option value="WMT">WMT</option>
+      <option value="JPM">JPM</option>
+      <option value="PG">PG</option>
+      <option value="UNH">UNH</option>
+      <option value="AXP">AXP</option>
+      <option value="BA">BA</option>
+      <option value="CAT">CAT</option>
+      <option value="CSCO">CSCO</option>
+      <option value="CVX">CVX</option>
+      <option value="DIS">DIS</option>
+      <option value="GS">GS</option>
+      <option value="HD">HD</option>
+      <option value="HON">HON</option>
+      <option value="IBM">IBM</option>
+      <option value="INTC">INTC</option>
+      <option value="KO">KO</option>
+      <option value="MCD">MCD</option>
+      <option value="MMM">MMM</option>
+      <option value="MRK">MRK</option>
+      <option value="NKE">NKE</option>
+      <option value="TRV">TRV</option>
+      <option value="WBA">WBA</option>
+      <option value="XOM">XOM</option>
+      <option value="DOW">DOW</option>
+    </select>
+    
+    <label for="startYear">Start Year: </label>
+    <input type="number" id="startYear" value="2014" min="2010" max="2024">
+    <label for="endYear">End Year: </label>
+    <input type="number" id="endYear" value="2024" min="2014" max="2024">
+    
+    <button id="updateButton">Update Visualization</button>
+  </div>
+  
+  <svg width="1200" height="800" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid meet"></svg>
+  
+  <!-- Tooltip div -->
+  <div id="tooltip" class="tooltip" style="display: none;"></div>
+  
+  <script>
+    const svg = d3.select("svg"),
+          width = +svg.attr("width"),
+          height = +svg.attr("height");
+
+    let simulation = d3.forceSimulation()
+        .force("link", d3.forceLink().id(d => d.id).distance(150))
+        .force("charge", d3.forceManyBody().strength(-300))
+        .force("center", d3.forceCenter(width / 2, height / 2)); // Ensure proper centering
+
+    const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+    // Select tooltip div
+    const tooltip = d3.select("#tooltip");
+
+    function updateGraph(data) {
+      // Clear old visualization
+      svg.selectAll("*").remove();
+
+      // ----- Create links (edges) -----
+      const link = svg.append("g")
+          .attr("class", "links")
+          .selectAll("line")
+          .data(data.edges)
+          .enter()
+          .append("line")
+          .attr("class", d => d.highlight ? "link highlight" : "link")
+          .attr("stroke-width", d => Math.abs(d.value) * 2)
+          .on("mouseover", function(event, d) {
+              tooltip.style("display", "block")
+                     .html(`${d.source.id} - ${d.target.id}<br>Correlation: ${d.value.toFixed(2)}`);
+          })
+          .on("mousemove", function(event) {
+              tooltip.style("left", (event.pageX + 10) + "px")
+                     .style("top", (event.pageY + 10) + "px");
+          })
+          .on("mouseout", function() {
+              tooltip.style("display", "none");
+          });
+
+      // ----- Create nodes (circles + labels) -----
+      const node = svg.append("g")
+          .attr("class", "nodes")
+          .selectAll("g")
+          .data(data.nodes)
+          .enter().append("g")
+          .call(d3.drag()
+              .on("start", dragstarted)
+              .on("drag", dragged)
+              .on("end", dragended));
+
+      node.append("circle")
+          .attr("r", 10)
+          .attr("fill", d => color(d.id));
+
+      node.append("text")
+          .attr("x", 12)
+          .attr("y", 3)
+          .text(d => d.id)
+          .style("font-size", "12px")
+          .style("fill", "#333");
+
+      // Setup simulation nodes and links
+      simulation.nodes(data.nodes);
+      simulation.force("link").links(data.edges);
+
+      // Restart simulation to ensure proper rendering
+      simulation.alpha(1).restart();
+
+      function ticked() {
+        link
+          .attr("x1", d => d.source.x)
+          .attr("y1", d => d.source.y)
+          .attr("x2", d => d.target.x)
+          .attr("y2", d => d.target.y);
+
+        node.attr("transform", d => `translate(${d.x},${d.y})`);
+      }
+
+      simulation.on("tick", ticked);
+    }
+
+    // Drag event functions
+    function dragstarted(event, d) {
+      if (!event.active) simulation.alphaTarget(0.3).restart();
+      d.fx = d.x;
+      d.fy = d.y;
+    }
+
+    function dragged(event, d) {
+      d.fx = event.x;
+      d.fy = event.y;
+    }
+
+    function dragended(event, d) {
+      if (!event.active) simulation.alphaTarget(0);
+      d.fx = null;
+      d.fy = null;
+    }
+
+    // Fetch data from the Flask backend
+    function fetchData() {
+      const startYear = document.getElementById("startYear").value;
+      const endYear = document.getElementById("endYear").value;
+      const selectedStock = document.getElementById("stockSelect").value;
+      const url = `/api/correlations?start_year=${startYear}&end_year=${endYear}&selected_stock=${selectedStock}`;
+      
+      fetch(url)
+          .then(response => response.json())
+          .then(data => {
+              updateGraph(data);
+          });
+    }
+
+    document.getElementById("updateButton").addEventListener("click", fetchData);
+
+    // Load initial visualization on page load
+    fetchData();
+  </script>
+</body>
+</html>
