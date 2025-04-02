@@ -47,13 +47,19 @@ stock_sectors = {
 }
 
 def get_stock_data(ticker, start_date, end_date):
-    data = yf.download(ticker, start=start_date, end=end_date, progress=False, auto_adjust=False)
-    if 'Adj Close' in data.columns:
-        return data['Adj Close']
-    elif 'Close' in data.columns:
-        return data['Close']
+    data = yf.download(ticker, start=start_date, end=end_date, progress=False, auto_adjust=False, group_by="ticker")
+    # Check if data has multi-level columns
+    if isinstance(data.columns, pd.MultiIndex):
+        if 'Adj Close' in data[ticker]:
+            return data[ticker]['Adj Close']
+        elif 'Close' in data[ticker]:
+            return data[ticker]['Close']
     else:
-        raise KeyError(f"'Adj Close' and 'Close' columns are missing for {ticker}")
+        if 'Adj Close' in data.columns:
+            return data['Adj Close']
+        elif 'Close' in data.columns:
+            return data['Close']
+    raise KeyError(f"'Adj Close' and 'Close' columns are missing for {ticker}")
 
 def compute_correlations(start_date, end_date, filtered_stocks):
     df = pd.DataFrame()
@@ -76,13 +82,19 @@ def home():
 @app.route('/visualization')
 def visualization():
     return render_template('index.html')
+
 @app.route('/api/timeseries', methods=['GET'])
 def timeseries():
     ticker = request.args.get('ticker')
     start_year = request.args.get('start', '2014')
     end_year = request.args.get('end', '2024')
     start_date = f"{start_year}-01-01"
+    
+    today = datetime.today()
     end_date = f"{end_year}-12-31"
+    # Don't request future data
+    if int(end_year) >= today.year:
+        end_date = today.strftime('%Y-%m-%d')
 
     try:
         series = get_stock_data(ticker, start_date, end_date)
@@ -92,6 +104,10 @@ def timeseries():
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@app.route('/minichart')
+def minichart():
+    return render_template('minichart.html')
 
 @app.route('/api/correlations', methods=['GET'])
 def correlations():

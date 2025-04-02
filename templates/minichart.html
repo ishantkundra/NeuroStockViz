@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini Chart - NeuroStockViz</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+        font-family: sans-serif;
+        text-align: center;
+        padding: 40px 20px;
+        background-color: #f9f9f9;
+      }
+      h2 {
+        margin-bottom: 20px;
+      }
+      #chartContainer {
+        width: 90%;
+        max-width: 1000px;
+        margin: 30px auto;
+        height: 500px;
+        background-color: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+      select {
+        padding: 8px 12px;
+        font-size: 16px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+      }
+  </style>
+</head>
+<body>
+  <h2>Time-Series Mini Chart</h2>
+  <label for="stockDropdown">Select Stock:</label>
+  <select id="stockDropdown" aria-label="Select a stock to view time series data">
+    <option value="">--Select--</option>
+  </select>
+  <br><br>
+  <label for="startYear">Start Year:</label>
+  <select id="startYear">
+    <option value="2010">2010</option>
+    <option value="2011">2011</option>
+    <option value="2012">2012</option>
+    <option value="2013">2013</option>
+    <option value="2014">2014</option>
+    <option value="2015">2015</option>
+    <option value="2016">2016</option>
+    <option value="2017">2017</option>
+    <option value="2018">2018</option>
+    <option value="2019">2019</option>
+    <option value="2020">2020</option>
+    <option value="2021">2021</option>
+    <option value="2022">2022</option>
+    <option value="2023">2023</option>
+    <option value="2024">2024</option>
+    <option value="2025">2025</option>
+  </select>
+  <label for="endYear">End Year:</label>
+  <select id="endYear">
+    <option value="2010">2010</option>
+    <option value="2011">2011</option>
+    <option value="2012">2012</option>
+    <option value="2013">2013</option>
+    <option value="2014">2014</option>
+    <option value="2015">2015</option>
+    <option value="2016">2016</option>
+    <option value="2017">2017</option>
+    <option value="2018">2018</option>
+    <option value="2019">2019</option>
+    <option value="2020">2020</option>
+    <option value="2021">2021</option>
+    <option value="2022">2022</option>
+    <option value="2023">2023</option>
+    <option value="2024">2024</option>
+    <option value="2025">2025</option>
+  </select>
+  <div id="chartContainer">
+    <canvas id="miniChartCanvas"></canvas>
+  </div>
+  <br>
+  <a href="/home" style="display:inline-block; margin-top: 20px; padding: 10px 20px; background-color: #007acc; color: white; text-decoration: none; border-radius: 5px;">Back to Home</a>
+  <script>
+    const stockList = ["AAPL", "MSFT", "GOOGL", "AMZN", "JNJ", "V", "WMT", "JPM", "PG", "UNH", "AXP", "BA", "CAT", "CSCO", "CVX", "DIS", "GS", "HD", "HON", "IBM", "INTC", "KO", "MCD", "MMM", "MRK", "NKE", "TRV", "WBA", "XOM", "DOW"];
+    const dropdown = document.getElementById('stockDropdown');
+    const startYearSelect = document.getElementById("startYear");
+    const endYearSelect = document.getElementById("endYear");
+
+    stockList.forEach(stock => {
+      const opt = document.createElement('option');
+      opt.value = stock;
+      opt.text = stock;
+      dropdown.appendChild(opt);
+    });
+
+    startYearSelect.value = "2014";
+    endYearSelect.value = "2024";
+
+
+    let miniChart;
+   
+    function updateChart() {
+      const ticker = dropdown.value;
+      if (!ticker) return;
+      const startYear = startYearSelect.value;
+      const endYear = endYearSelect.value;
+      const canvas = document.getElementById("miniChartCanvas");
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      fetch(`/api/timeseries?ticker=${encodeURIComponent(ticker)}&start=${startYear}&end=${endYear}`)
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to fetch data.");
+        return res.json();
+        })
+        .then(data => {
+          if (miniChart) miniChart.destroy();
+          miniChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: data.dates,
+              datasets: [{
+                label: `${ticker} Price`,
+                data: data.prices,
+                borderColor: 'steelblue',
+                fill: false,
+                tension: 0.1
+              }]
+            },
+            options: {
+              responsive: true,
+              scales: {
+                x: { display: true, title: { display: true, text: "Date" }},
+                y: { display: true, title: { display: true, text: "Price" }}
+              }
+            }
+          });
+        })
+        .catch(error => {
+          alert("Error fetching data: " + error.message);
+        });
+    }
+
+    dropdown.addEventListener("change", updateChart);
+    startYearSelect.addEventListener("change", updateChart);
+    endYearSelect.addEventListener("change", updateChart);
+  </script>
+</body>
+</html>
