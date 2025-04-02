@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Stock Clusters - NeuroStockViz</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      background-color: #f4f4f4;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+    #controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      padding: 10px;
+      background: #fff;
+      border-bottom: 1px solid #ccc;
+      font-size: 14px;
+    }
+    select {
+      padding: 4px 8px;
+      font-size: 14px;
+    }
+    h2 {
+      margin: 10px 0 0;
+      text-align: center;
+    }
+    p {
+      margin: 0 0 10px;
+      font-size: 14px;
+      text-align: center;
+    }
+    svg {
+      width: 100vw;
+      height: calc(100vh - 140px); /* header + controls height */
+      display: block;
+      background-color: #ffffff;
+    }
+    .back-button {
+      display: inline-block;
+      background-color: #007acc;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 5px;
+      text-decoration: none;
+      margin: 10px auto;
+      text-align: center;
+    }
+    .back-button:hover {
+      background-color: #005f99;
+    }
+  </style>
+</head>
+<body>
+  <h2>Stock Cluster View</h2>
+  <p>Grouped by correlation strength using K-Means</p>
+
+  <div id="controls">
+    <label>Start Year:
+      <select id="startYear"></select>
+    </label>
+    <label>End Year:
+      <select id="endYear"></select>
+    </label>
+    <label>Clusters:
+      <select id="numClusters">
+        <option>3</option>
+        <option selected>4</option>
+        <option>5</option>
+        <option>6</option>
+      </select>
+    </label>
+    <a href="/home" class="back-button">Back to Home</a>
+  </div>
+
+  <svg></svg>
+
+  <script>
+    const svg = d3.select("svg");
+    const width = window.innerWidth;
+    const height = window.innerHeight - 140;
+    const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+    function populateYearSelects() {
+      const startYearSelect = document.getElementById("startYear");
+      const endYearSelect = document.getElementById("endYear");
+      for (let year = 2010; year <= 2025; year++) {
+        const startOpt = document.createElement("option");
+        const endOpt = document.createElement("option");
+        startOpt.value = endOpt.value = year;
+        startOpt.text = endOpt.text = year;
+        if (year === 2014) startOpt.selected = true;
+        if (year === 2024) endOpt.selected = true;
+        startYearSelect.appendChild(startOpt);
+        endYearSelect.appendChild(endOpt);
+      }
+    }
+
+    function fetchAndDraw() {
+      const start = document.getElementById("startYear").value;
+      const end = document.getElementById("endYear").value;
+      const k = document.getElementById("numClusters").value;
+
+      fetch(`/api/clusters?start=${start}&end=${end}&k=${k}`)
+        .then(res => res.json())
+        .then(data => {
+          svg.selectAll("*").remove();
+
+          const nodes = Object.keys(data).map(ticker => ({
+            id: ticker,
+            group: data[ticker]
+          }));
+
+          const simulation = d3.forceSimulation(nodes)
+            .force("charge", d3.forceManyBody().strength(-200))
+            .force("center", d3.forceCenter(width / 2, height / 2))
+            .force("collision", d3.forceCollide(35))
+            .force("x", d3.forceX(width / 2).strength(0.05))
+            .force("y", d3.forceY(height / 2).strength(0.05))
+            .on("tick", ticked);
+
+          const node = svg.selectAll("g")
+            .data(nodes)
+            .enter()
+            .append("g")
+            .attr("class", "node");
+
+          node.append("circle")
+            .attr("r", 18)
+            .attr("fill", d => color(d.group));
+
+          node.append("text")
+            .text(d => d.id)
+            .attr("text-anchor", "middle")
+            .attr("dy", 5)
+            .style("font-size", "12px");
+
+          function ticked() {
+            node.attr("transform", d => {
+              d.x = Math.max(30, Math.min(width - 30, d.x));
+              d.y = Math.max(30, Math.min(height - 30, d.y));
+              return `translate(${d.x},${d.y})`;
+            });
+          }
+        })
+        .catch(err => {
+          svg.selectAll("*").remove();
+          svg.append("text")
+            .attr("x", width / 2)
+            .attr("y", height / 2)
+            .attr("text-anchor", "middle")
+            .style("fill", "crimson")
+            .style("font-size", "16px")
+            .text("Failed to load cluster data.");
+          console.error("Cluster fetch error:", err);
+        });
+    }
+
+    document.getElementById("startYear").addEventListener("change", fetchAndDraw);
+    document.getElementById("endYear").addEventListener("change", fetchAndDraw);
+    document.getElementById("numClusters").addEventListener("change", fetchAndDraw);
+
+    window.onload = () => {
+      populateYearSelects();
+      fetchAndDraw();
+    };
+  </script>
+</body>
+</html>

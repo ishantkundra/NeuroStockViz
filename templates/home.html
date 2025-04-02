@@ -5,49 +5,67 @@
   <title>Welcome to NeuroStockViz</title>
   <style>
     body {
-      font-family: sans-serif;
-      background-color: #f5f5f5;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: black;
       text-align: center;
-      padding: 20px;
-    }
-    .container {
-      background-color: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-      display: inline-block;
+      padding: 80px 20px;
+      color: #ccc;
     }
     h1 {
-      color: #333;
+      color: #ccc;
     }
     p {
       font-size: 18px;
-      color: #666;
+      color: #ccc;
     }
     a.button {
       display: inline-block;
-      margin-top: 15px;
+      margin-top: 10px;
       padding: 12px 24px;
-      background-color: #007acc;
-      color: white;
+      background-color: #333;
+      color: #ccc;
       text-decoration: none;
       border-radius: 5px;
       font-weight: bold;
     }
     a.button:hover {
-      background-color: #005f99;
+      background-color: #444;
+    }
+    .center-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 80vh;
+      overflow: hidden;
+    }
+    .button-container {
+      display: flex;
+      
+      justify-content: center;
+      gap: 20px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="center-container">
     <h1>Welcome to NeuroStockViz</h1>
     <p>Visualize stock correlations as neural networks. Explore how stocks interact over time and discover hidden relationships.</p>
-    <a href="/visualization" class="button">Launch Visualization</a>
-    <a href="/minichart" class="button">View Time-Series Mini Chart</a>
-    <a href="/heatmap" class="button">View Correlation Heatmap</a>  
-    <a href="/clusters" class="button">Explore Stock Clusters</a>
-    
+    <div class="button-container">
+      <a href="/visualization" class="button">Launch Visualization</a>
+      <a href="/minichart" class="button">View Time-Series Mini Chart</a>
+      <a href="/heatmap" class="button">View Correlation Heatmap</a>  
+      <a href="/clusters" class="button">Explore Stock Clusters</a>
+    </div>
+  </div>
+  <div style="position: fixed; bottom: 20px; right: 20px; text-align: right; color: #bbb; font-size: 15px; line-height: 1.6; font-family: 'Segoe UI', sans-serif;">
+    <div style="font-weight: bold; font-size: 16px;">Texas A&amp;M University</div>
+    <div>CSCE 679 600: Data Visualization (Spring 2025)</div>
+    <div>Instructor: Prof. Meng Xia</div>
+    <div style="margin-top: 8px; font-style: italic;">Developed by:</div>
+    <div>Ishant Kundra</div>
+    <div>Rahaan Gandhi</div>
+    <div>Tanishq Chopra</div>
   </div>
 </body>
 </html>

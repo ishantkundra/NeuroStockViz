@@ -93,6 +93,10 @@ def home():
 def visualization():
     return render_template('index.html')
 
+@app.route('/clusters')
+def cluster_view():
+    return render_template('clusters.html')
+
 @app.route('/api/timeseries', methods=['GET'])
 def timeseries():
     ticker = request.args.get('ticker')
