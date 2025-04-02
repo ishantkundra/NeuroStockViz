@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify, redirect
 import yfinance as yf
 import pandas as pd
 from datetime import datetime
+from sklearn.cluster import KMeans
 
 app = Flask(__name__)
 
@@ -68,7 +69,16 @@ def compute_correlations(start_date, end_date, filtered_stocks):
             df[ticker] = get_stock_data(ticker, start_date, end_date)
         except Exception as e:
             print(f"Error fetching data for {ticker}: {e}")
+
+    # Keep only stocks (columns) that have at least 80% non-null values
+    df = df.dropna(axis=1, thresh=int(0.8 * len(df)))
+
+    # Now drop any remaining rows with NaNs
     df.dropna(inplace=True)
+
+    if df.shape[1] < 2:
+        return pd.DataFrame()  # Not enough stocks left to compute correlations
+
     return df.corr(method='pearson')
 
 @app.route('/')
@@ -108,6 +118,15 @@ def timeseries():
 @app.route('/minichart')
 def minichart():
     return render_template('minichart.html')
+
+@app.route('/api/correlation_matrix')
+def correlation_matrix():
+    start_year = request.args.get('start', '2014')
+    end_year = request.args.get('end', '2024')
+    start_date = f"{start_year}-01-01"
+    end_date = f"{end_year}-12-31"
+    corr_matrix = compute_correlations(start_date, end_date, stocks)
+    return corr_matrix.to_json()
 
 @app.route('/api/correlations', methods=['GET'])
 def correlations():
@@ -217,6 +236,27 @@ def correlations():
         "non_correlated": non_correlated_list,
         "indirectly_correlated": indirect_list
     })
+    
+@app.route('/api/clusters')
+def clusters():
+    start_year = request.args.get('start', '2014')
+    end_year = request.args.get('end', '2024')
+    start_date = f"{start_year}-01-01"
+    end_date = f"{end_year}-12-31"
+    corr_matrix = compute_correlations(start_date, end_date, stocks)
+    
+    # Replace NaN with 0 before clustering
+    corr_filled = corr_matrix.fillna(0)
+    
+    k = int(request.args.get('k', 4))  # Default to 4 clusters
+    km = KMeans(n_clusters=k, random_state=42)
+    labels = km.fit_predict(corr_filled)
+    
+    return jsonify({ticker: int(label) for ticker, label in zip(corr_matrix.columns, labels)})
+
+@app.route('/heatmap')
+def heatmap():
+    return render_template('heatmap.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
