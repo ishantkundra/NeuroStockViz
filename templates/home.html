@@ -47,18 +47,18 @@
     .grid-view {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-      gap: 16px;
-      padding: 0 20px;
+      gap: 10px;
+      padding: 10px 20px;
       max-width: 1400px;
       margin: 0 auto;
-      height: calc(100vh - 220px); /* shrink total grid height */
-      overflow: hidden;
+      height: calc(100vh - 200px);
+      overflow-y: auto;
     }
     a.viz-card {
       background-color: #1a1a1a;
       border: 1px solid #444;
       border-radius: 8px;
-      padding: 8px;
+      padding: 10px;
       color: #ccc;
       overflow: hidden;
       text-decoration: none;
