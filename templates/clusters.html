@@ -8,12 +8,19 @@
     html, body {
       margin: 0;
       padding: 0;
-      font-family: sans-serif;
-      background-color: #f4f4f4;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #000;
       height: 100%;
       width: 100%;
+      color: #ccc;
       overflow: hidden;
     }
+    header {
+        background-color: #111;
+        color: #ccc;
+        padding: 10px;
+        text-align: center;
+      }
     #controls {
       display: flex;
       justify-content: center;
@@ -21,47 +28,61 @@
       gap: 20px;
       flex-wrap: wrap;
       padding: 10px;
-      background: #fff;
-      border-bottom: 1px solid #ccc;
+      background: #000;
+      border-bottom: 1px solid #333;
       font-size: 14px;
     }
     select {
+      background-color: #222;
+      color: #ccc;
+      border: 1px solid #555;
+      border-radius: 4px;
       padding: 4px 8px;
       font-size: 14px;
     }
-    h2 {
-      margin: 10px 0 0;
-      text-align: center;
-    }
-    p {
-      margin: 0 0 10px;
-      font-size: 14px;
-      text-align: center;
-    }
     svg {
       width: 100vw;
-      height: calc(100vh - 140px); /* header + controls height */
+      height: calc(100vh - 140px);
       display: block;
-      background-color: #ffffff;
+      background-color: #000;
     }
     .back-button {
-      display: inline-block;
-      background-color: #007acc;
-      color: white;
-      padding: 8px 16px;
-      border-radius: 5px;
-      text-decoration: none;
-      margin: 10px auto;
-      text-align: center;
+      background: none;
+      color: #00c8ff;
+      text-decoration: underline;
+      font-size: 13px;
+      border: none;
+      padding: 0;
+      margin-left: 10px;
+      cursor: pointer;
     }
     .back-button:hover {
-      background-color: #005f99;
+        text-decoration: none;
+        color: #33d1ff;
     }
+    .tooltip {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        pointer-events: none;
+        font-size: 13px;
+        color: #000;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+        display: none;
+        z-index: 10;
+        transition: opacity 0.2s ease-in-out;
+      }
   </style>
 </head>
+<div class="tooltip" id="tooltip"></div>
 <body>
-  <h2>Stock Cluster View</h2>
-  <p>Grouped by correlation strength using K-Means</p>
+    <header>
+        <h2>NeuroStockViz</h2>
+        <p>Stock Cluster View - Grouped by K-Means Clustering</p>
+        <a href="/home" class="back-button">Back to Home</a>
+      </header>
 
   <div id="controls">
     <label>Start Year:
@@ -78,7 +99,6 @@
         <option>6</option>
       </select>
     </label>
-    <a href="/home" class="back-button">Back to Home</a>
   </div>
 
   <svg></svg>
@@ -88,6 +108,7 @@
     const width = window.innerWidth;
     const height = window.innerHeight - 140;
     const color = d3.scaleOrdinal(d3.schemeCategory10);
+    const tooltip = d3.select("#tooltip");
 
     function populateYearSelects() {
       const startYearSelect = document.getElementById("startYear");
@@ -131,7 +152,19 @@
             .data(nodes)
             .enter()
             .append("g")
-            .attr("class", "node");
+            .attr("class", "node")
+            .on("mouseover", (event, d) => {
+                tooltip.style("display", "block")
+                       .html(`<strong>${d.id}</strong><br>Cluster: ${d.group}`);
+              })
+              .on("mousemove", (event) => {
+                tooltip
+                .style("left", Math.min(event.pageX + 10, window.innerWidth - 150) + "px")
+                .style("top", (event.pageY + 10) + "px");
+              })
+              .on("mouseout", () => {
+                tooltip.style("display", "none");
+            });
 
           node.append("circle")
             .attr("r", 18)
