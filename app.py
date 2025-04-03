@@ -3,8 +3,10 @@ import yfinance as yf
 import pandas as pd
 from datetime import datetime
 from sklearn.cluster import KMeans
+from flask_caching import Cache
 
 app = Flask(__name__)
+cache = Cache(app, config={'CACHE_TYPE': 'SimpleCache'})
 
 # Dow Jones 30 components
 stocks = [
@@ -81,6 +83,10 @@ def compute_correlations(start_date, end_date, filtered_stocks):
 
     return df.corr(method='pearson')
 
+@cache.cached(timeout=300, key_prefix='correlation_matrix')
+def compute_correlations_cached(start_date, end_date, filtered_stocks):
+    return compute_correlations(start_date, end_date, filtered_stocks)
+
 @app.route('/')
 def index():
     return redirect('/home')
@@ -129,7 +135,7 @@ def correlation_matrix():
     end_year = request.args.get('end', '2024')
     start_date = f"{start_year}-01-01"
     end_date = f"{end_year}-12-31"
-    corr_matrix = compute_correlations(start_date, end_date, stocks)
+    corr_matrix = compute_correlations_cached(start_date, end_date, stocks)
     return corr_matrix.to_json()
 
 @app.route('/api/correlations', methods=['GET'])
@@ -249,14 +255,25 @@ def clusters():
     end_date = f"{end_year}-12-31"
     corr_matrix = compute_correlations(start_date, end_date, stocks)
     
+    # Validate correlation matrix
+    if corr_matrix.empty:
+        return jsonify({"error": "Correlation matrix is empty. Ensure sufficient data is available."}), 400
+
     # Replace NaN with 0 before clustering
     corr_filled = corr_matrix.fillna(0)
     
-    k = int(request.args.get('k', 4))  # Default to 4 clusters
-    km = KMeans(n_clusters=k, random_state=42)
-    labels = km.fit_predict(corr_filled)
-    
-    return jsonify({ticker: int(label) for ticker, label in zip(corr_matrix.columns, labels)})
+    try:
+        k = int(request.args.get('k', 4))  # Default to 4 clusters
+        if k <= 0:
+            return jsonify({"error": "Number of clusters (k) must be a positive integer."}), 400
+
+        km = KMeans(n_clusters=k, random_state=42)
+        labels = km.fit_predict(corr_filled)
+        return jsonify({ticker: int(label) for ticker, label in zip(corr_matrix.columns, labels)})
+    except ValueError as ve:
+        return jsonify({"error": f"Value error during clustering: {str(ve)}"}), 500
+    except Exception as e:
+        return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
 
 @app.route('/heatmap')
 def heatmap():

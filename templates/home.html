@@ -9,8 +9,9 @@
       background-color: black;
       text-align: center;
       padding: 20px;
+      padding-right: 20px; /* Add padding to prevent overlap with scrollbar */
       color: #ccc;
-      overflow: hidden;
+      overflow: auto;
     }
     h1 {
       color: #ccc;
@@ -48,8 +49,7 @@
       padding: 0 20px;
       max-width: 1400px;
       margin: 0 auto;
-      height: calc(100vh - 220px); /* shrink total grid height */
-      overflow: hidden;
+      overflow-y: auto;
     }
     a.viz-card {
       background-color: #1a1a1a;
@@ -58,24 +58,35 @@
       padding: 8px;
       color: #ccc;
       text-decoration: none;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      height: 300px; /* smaller height */
+      display: block;
+      min-height: 380px;
     }
+    
     a.viz-card h3 {
       margin: 10px 0;
       font-size: 18px;
       color: #00c8ff;
     }
-    a.viz-card iframe {
-      flex: 1;
+    a.viz-card img {
       width: 100%;
-      height: auto;
-      border: none;
-      background-color: #000;
-      object-fit: contain;
-      pointer-events: none;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+      will-change: transform;
+    }
+
+    .bottom-right-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      text-align: right;
+      color: #bbb;
+      font-size: 15px;
+      line-height: 1.6;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: rgba(0, 0, 0, 0.8); /* Add background for better visibility */
+      padding: 10px; /* Add padding for spacing */
+      border-radius: 8px; /* Rounded corners */
     }
   </style>
 </head>
@@ -87,22 +98,22 @@
   <div class="grid-view">
     <a href="/visualization" class="viz-card">
       <h3>Neural Correlation Network</h3>
-      <iframe src="/visualization#onlyviz"></iframe>
+      <img src="/static/images/ncn.jpg" alt="Neural Correlation Network" loading="lazy">
     </a>
     <a href="/minichart" class="viz-card">
       <h3>Time-Series Mini Chart</h3>
-      <iframe src="/minichart#onlyviz"></iframe>
+      <img src="/static/images/line.jpg" alt="Time-Series Mini Chart" loading="lazy">
     </a>
     <a href="/heatmap" class="viz-card">
       <h3>Correlation Heatmap</h3>
-      <iframe src="/heatmap#onlyviz"></iframe>
+      <img src="/static/images/heatmap.png" alt="Correlation Heatmap" loading="lazy">
     </a>
     <a href="/clusters" class="viz-card">
       <h3>Stock Cluster View</h3>
-      <iframe src="/clusters#onlyviz"></iframe>
+      <img src="/static/images/cluster.png" alt="Stock Cluster View" loading="lazy">
     </a>
   </div>
-  <div style="position: fixed; bottom: 20px; right: 20px; text-align: right; color: #bbb; font-size: 15px; line-height: 1.6; font-family: 'Segoe UI', sans-serif;">
+  <div class="bottom-right-container">
     <div style="font-weight: bold; font-size: 16px;">Texas A&amp;M University</div>
     <div>CSCE 679 600: Data Visualization (Spring 2025)</div>
     <div>Instructor: Prof. Meng Xia</div>
