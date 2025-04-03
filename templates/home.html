@@ -9,8 +9,9 @@
       background-color: black;
       text-align: center;
       padding: 20px;
+      padding-right: 20px; /* Add padding to prevent overlap with scrollbar */
       color: #ccc;
-      overflow: hidden;
+      overflow: auto;
     }
     h1 {
       color: #ccc;
@@ -51,7 +52,6 @@
       padding: 10px 20px;
       max-width: 1400px;
       margin: 0 auto;
-      height: calc(100vh - 200px);
       overflow-y: auto;
     }
     a.viz-card {
@@ -63,8 +63,9 @@
       overflow: hidden;
       text-decoration: none;
       display: block;
-      height: 380px;
+      min-height: 380px;
     }
+    
     a.viz-card h3 {
       margin: 10px 0;
       font-size: 18px;
@@ -77,6 +78,7 @@
       border-radius: 8px;
       will-change: transform;
     }
+
     .bottom-right-container {
       position: fixed;
       bottom: 20px;
