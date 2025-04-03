@@ -9,6 +9,7 @@
       background-color: black;
       text-align: center;
       padding: 20px;
+      padding-right: 20px; /* Add padding to prevent overlap with scrollbar */
       color: #ccc;
       overflow: hidden;
     }
@@ -79,6 +80,19 @@
       transform: scale(1);
       transform-origin: top left;
     }
+    .bottom-right-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      text-align: right;
+      color: #bbb;
+      font-size: 15px;
+      line-height: 1.6;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: rgba(0, 0, 0, 0.8); /* Add background for better visibility */
+      padding: 10px; /* Add padding for spacing */
+      border-radius: 8px; /* Rounded corners */
+    }
   </style>
 </head>
 <body>
@@ -104,7 +118,7 @@
       <iframe src="/clusters#onlyviz"></iframe>
     </a>
   </div>
-  <div style="position: fixed; bottom: 20px; right: 20px; text-align: right; color: #bbb; font-size: 15px; line-height: 1.6; font-family: 'Segoe UI', sans-serif;">
+  <div class="bottom-right-container">
     <div style="font-weight: bold; font-size: 16px;">Texas A&amp;M University</div>
     <div>CSCE 679 600: Data Visualization (Spring 2025)</div>
     <div>Instructor: Prof. Meng Xia</div>
