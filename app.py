@@ -249,14 +249,25 @@ def clusters():
     end_date = f"{end_year}-12-31"
     corr_matrix = compute_correlations(start_date, end_date, stocks)
     
+    # Validate correlation matrix
+    if corr_matrix.empty:
+        return jsonify({"error": "Correlation matrix is empty. Ensure sufficient data is available."}), 400
+
     # Replace NaN with 0 before clustering
     corr_filled = corr_matrix.fillna(0)
     
-    k = int(request.args.get('k', 4))  # Default to 4 clusters
-    km = KMeans(n_clusters=k, random_state=42)
-    labels = km.fit_predict(corr_filled)
-    
-    return jsonify({ticker: int(label) for ticker, label in zip(corr_matrix.columns, labels)})
+    try:
+        k = int(request.args.get('k', 4))  # Default to 4 clusters
+        if k <= 0:
+            return jsonify({"error": "Number of clusters (k) must be a positive integer."}), 400
+
+        km = KMeans(n_clusters=k, random_state=42)
+        labels = km.fit_predict(corr_filled)
+        return jsonify({ticker: int(label) for ticker, label in zip(corr_matrix.columns, labels)})
+    except ValueError as ve:
+        return jsonify({"error": f"Value error during clustering: {str(ve)}"}), 500
+    except Exception as e:
+        return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
 
 @app.route('/heatmap')
 def heatmap():

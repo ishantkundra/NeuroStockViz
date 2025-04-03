@@ -71,14 +71,11 @@
       font-size: 18px;
       color: #00c8ff;
     }
-    a.viz-card iframe {
+    a.viz-card img {
       width: 100%;
       height: 100%;
-      border: none;
-      background-color: #000;
-      pointer-events: none;
-      transform: scale(1);
-      transform-origin: top left;
+      object-fit: cover;
+      border-radius: 8px;
     }
     .bottom-right-container {
       position: fixed;
@@ -103,19 +100,19 @@
   <div class="grid-view">
     <a href="/visualization" class="viz-card">
       <h3>Neural Correlation Network</h3>
-      <iframe src="/visualization#onlyviz"></iframe>
+      <img src="/static/images/ncn.jpg" alt="Neural Correlation Network">
     </a>
     <a href="/minichart" class="viz-card">
       <h3>Time-Series Mini Chart</h3>
-      <iframe src="/minichart#onlyviz"></iframe>
+      <img src="/static/images/line.jpg" alt="Time-Series Mini Chart">
     </a>
     <a href="/heatmap" class="viz-card">
       <h3>Correlation Heatmap</h3>
-      <iframe src="/heatmap#onlyviz"></iframe>
+      <img src="/static/images/heatmap.png" alt="Correlation Heatmap">
     </a>
     <a href="/clusters" class="viz-card">
       <h3>Stock Cluster View</h3>
-      <iframe src="/clusters#onlyviz"></iframe>
+      <img src="/static/images/cluster.png" alt="Stock Cluster View">
     </a>
   </div>
   <div class="bottom-right-container">
