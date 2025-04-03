@@ -76,6 +76,7 @@
       height: 100%;
       object-fit: cover;
       border-radius: 8px;
+      will-change: transform;
     }
     .bottom-right-container {
       position: fixed;
@@ -100,19 +101,19 @@
   <div class="grid-view">
     <a href="/visualization" class="viz-card">
       <h3>Neural Correlation Network</h3>
-      <img src="/static/images/ncn.jpg" alt="Neural Correlation Network">
+      <img src="/static/images/ncn.jpg" alt="Neural Correlation Network" loading="lazy">
     </a>
     <a href="/minichart" class="viz-card">
       <h3>Time-Series Mini Chart</h3>
-      <img src="/static/images/line.jpg" alt="Time-Series Mini Chart">
+      <img src="/static/images/line.jpg" alt="Time-Series Mini Chart" loading="lazy">
     </a>
     <a href="/heatmap" class="viz-card">
       <h3>Correlation Heatmap</h3>
-      <img src="/static/images/heatmap.png" alt="Correlation Heatmap">
+      <img src="/static/images/heatmap.png" alt="Correlation Heatmap" loading="lazy">
     </a>
     <a href="/clusters" class="viz-card">
       <h3>Stock Cluster View</h3>
-      <img src="/static/images/cluster.png" alt="Stock Cluster View">
+      <img src="/static/images/cluster.png" alt="Stock Cluster View" loading="lazy">
     </a>
   </div>
   <div class="bottom-right-container">

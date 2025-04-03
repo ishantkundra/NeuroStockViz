@@ -3,8 +3,10 @@ import yfinance as yf
 import pandas as pd
 from datetime import datetime
 from sklearn.cluster import KMeans
+from flask_caching import Cache
 
 app = Flask(__name__)
+cache = Cache(app, config={'CACHE_TYPE': 'SimpleCache'})
 
 # Dow Jones 30 components
 stocks = [
@@ -81,6 +83,10 @@ def compute_correlations(start_date, end_date, filtered_stocks):
 
     return df.corr(method='pearson')
 
+@cache.cached(timeout=300, key_prefix='correlation_matrix')
+def compute_correlations_cached(start_date, end_date, filtered_stocks):
+    return compute_correlations(start_date, end_date, filtered_stocks)
+
 @app.route('/')
 def index():
     return redirect('/home')
@@ -129,7 +135,7 @@ def correlation_matrix():
     end_year = request.args.get('end', '2024')
     start_date = f"{start_year}-01-01"
     end_date = f"{end_year}-12-31"
-    corr_matrix = compute_correlations(start_date, end_date, stocks)
+    corr_matrix = compute_correlations_cached(start_date, end_date, stocks)
     return corr_matrix.to_json()
 
 @app.route('/api/correlations', methods=['GET'])
