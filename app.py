@@ -103,6 +103,89 @@ def visualization():
 def cluster_view():
     return render_template('clusters.html')
 
+@app.route('/api/candlestick')
+def candlestick_data():
+    ticker = request.args.get('ticker')
+    start_year = request.args.get('start', '2014')
+    end_year = request.args.get('end', '2024')
+    
+    start_date = f"{start_year}-01-01"
+    end_date = f"{end_year}-12-31"
+
+    try:
+        # Force auto_adjust=False so we get standard OHLC columns
+        # group_by='column' tries to produce single-level columns for a single ticker
+        df = yf.download(
+            ticker,
+            start=start_date,
+            end=end_date,
+            progress=False,
+            auto_adjust=False,
+            group_by='column'
+        )
+
+        # If no data was returned, bail out
+        if df.empty:
+            return jsonify({"error": f"No data found for {ticker} from {start_date} to {end_date}"}), 400
+
+        # Reset index so the DateTimeIndex becomes a normal 'Date' column
+        df.reset_index(inplace=True)
+
+        # 1) If columns are multi-level, flatten them
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = [
+                "_".join(str(x).strip() for x in col if x)  # skip empty items
+                for col in df.columns.to_flat_index()
+            ]
+
+        # 2) Rename columns that contain underscores, e.g. 'Open_<ticker>' → 'Open'
+        rename_map = {}
+        for col in df.columns:
+            # For example, if we have 'Open_V' or 'Open_AAPL', rename to 'Open'
+            if col.startswith("Open_"):
+                rename_map[col] = "Open"
+            elif col.startswith("High_"):
+                rename_map[col] = "High"
+            elif col.startswith("Low_"):
+                rename_map[col] = "Low"
+            elif col.startswith("Close_"):
+                rename_map[col] = "Close"
+            elif col.startswith("Date_"):
+                rename_map[col] = "Date"
+
+        df.rename(columns=rename_map, inplace=True)
+
+        # 3) Ensure we have a 'Date' column
+        if 'Date' not in df.columns:
+            if 'index' in df.columns:
+                df.rename(columns={'index': 'Date'}, inplace=True)
+            else:
+                df['Date'] = df.index
+
+        # 4) Convert 'Date' to datetime, drop invalid
+        df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+        df.dropna(subset=['Date'], inplace=True)
+
+        # 5) Double-check for required columns
+        for col_name in ["Open", "High", "Low", "Close"]:
+            if col_name not in df.columns:
+                return jsonify({"error": f"Missing '{col_name}' column in data."}), 400
+
+        # 6) Build the JSON response
+        data = []
+        for _, row in df.iterrows():
+            data.append({
+                "date": row["Date"].strftime("%Y-%m-%d"),
+                "open": round(row["Open"], 2),
+                "high": round(row["High"], 2),
+                "low": round(row["Low"], 2),
+                "close": round(row["Close"], 2)
+            })
+
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
 @app.route('/api/timeseries', methods=['GET'])
 def timeseries():
     ticker = request.args.get('ticker')
@@ -278,6 +361,10 @@ def clusters():
 @app.route('/heatmap')
 def heatmap():
     return render_template('heatmap.html')
+
+@app.route('/candlestick')
+def candlestick():
+    return render_template('candlestick.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
