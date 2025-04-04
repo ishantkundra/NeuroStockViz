@@ -118,7 +118,7 @@ Go to: [http://localhost:5000](http://localhost:5000)
 ---
 
 ## 🌱 Future Enhancements
- 
+
 - Export visualizations (PNG/PDF)  
 - Add historical comparison tables  
 - Expand to S&P 500 / NASDAQ-100 stocks  
@@ -128,3 +128,19 @@ Go to: [http://localhost:5000](http://localhost:5000)
 ## 📜 License
 
 MIT License — for educational and academic use only.
+
+---
+
+## 👨‍💻 Authors
+
+**Ishant Kundra**  
+*M.S. Computer Science, Texas A&M University*  
+📧 [ishantkundra9@gmail.com](mailto:ishantkundra9@gmail.com)
+
+**Rahaan Gandhi**  
+*M.S. Computer Science, Texas A&M University*
+📧 [rahaan123@gmail.com](mailto:rahaan123@gmail.com)
+
+**Tanishq Chopra**  
+*M.S. Computer Science, Texas A&M University*
+📧 [tanishqtc1980@gmail.com](mailto:tanishqtc1980@gmail.com)
