@@ -92,12 +92,26 @@
       padding: 10px; /* Add padding for spacing */
       border-radius: 8px; /* Rounded corners */
     }
+
+    .bull-image {
+      height: 100px; /* or any fixed height */
+      width: 100%%; /* or any width */
+      overflow: hidden; /* hide anything that exceeds the bounds */
+      position: relative;
+      margin-bottom: -30px;
+    }
+    .bull-image img {
+      height: 100px;
+      width: 210px;
+      object-fit: contain;
+      transform: scale(1.7);
+    }
   </style>
 </head>
 <body>
   <!-- Add a container for the symbol at the top center -->
-  <div style="text-align: center;">
-    <img src="static\images\head.jpg" alt="Custom Symbol" style="height: 80px;">
+  <div class="bull-image" style="text-align: center;">
+    <img src="static\images\head.jpg" alt="Custom Symbol">
   </div>
   <div class="center-container">
     <h1>Welcome to NeuroStockViz</h1>
