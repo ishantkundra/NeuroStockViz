@@ -100,10 +100,10 @@ Go to: [http://localhost:5000](http://localhost:5000)
 ## 🖼️ Preview Screenshots
 
 #### 🏠 Home Page
-![Home Page](static/images/head.jpg)
+![Home Page](static/images/main.jpg)
 
 #### 🧠 Neural Correlation Network
-![Neural Correlation Network](static/images/ncn.jpg)
+![Neural Correlation Network](static/images/NCN2.jpg)
 
 #### 📈 Time-Series Mini Chart
 ![Time Series Chart](static/images/line.jpg)
