@@ -118,8 +118,7 @@ Go to: [http://localhost:5000](http://localhost:5000)
 ---
 
 ## 🌱 Future Enhancements
-
-- Hover tooltips for candlestick OHLC data  
+ 
 - Export visualizations (PNG/PDF)  
 - Add historical comparison tables  
 - Expand to S&P 500 / NASDAQ-100 stocks  
