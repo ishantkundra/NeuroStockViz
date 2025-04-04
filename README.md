@@ -99,12 +99,23 @@ Go to: [http://localhost:5000](http://localhost:5000)
 
 ## 🖼️ Preview Screenshots
 
-- Home Page  
-- Neural Correlation Network  
-- Time-Series Chart  
-- Correlation Heatmap  
-- Stock Clustering  
-- Candlestick Chart  
+#### 🏠 Home Page
+![Home Page](static/images/head.jpg)
+
+#### 🧠 Neural Correlation Network
+![Neural Correlation Network](static/images/ncn.jpg)
+
+#### 📈 Time-Series Mini Chart
+![Time Series Chart](static/images/line.jpg)
+
+#### 🔥 Correlation Heatmap
+![Correlation Heatmap](static/images/heatmap.jpg)
+
+#### 🧩 Stock Clustering View
+![Clustering View](static/images/cluster.png)
+
+#### 📊 Candlestick Chart
+![Candlestick Chart](static/images/candlestick.jpg)
 
 ---
 
