@@ -49,6 +49,8 @@ NeuroStockViz/
 │       ├── head.jpg
 │       ├── heatmap.jpg
 │       ├── line.jpg
+│       ├── main.jpg
+│       ├── NCN2.jpg
 │       └── ncn.jpg
 ├── templates/               # HTML files for each visualization
 │   ├── candlestick.html
