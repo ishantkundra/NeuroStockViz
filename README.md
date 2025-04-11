@@ -59,8 +59,7 @@ NeuroStockViz/
 │   ├── home.html
 │   ├── index.html           # Neural correlation view
 │   └── minichart.html
-├── Report/
-│   ├── report.pdf
+├──  report.pdf
 ├── app.py                   # Flask routes and backend logic
 ├── LICENSE
 ├── README.md                # Project documentation
