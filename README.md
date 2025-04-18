@@ -65,6 +65,7 @@ NeuroStockViz/
 │   ├── Demo Video.mov
 ├── app.py                   # Flask routes and backend logic
 ├── LICENSE
+├── .gitattributes
 ├── README.md                # Project documentation
 └── .gitignore
 </pre>
