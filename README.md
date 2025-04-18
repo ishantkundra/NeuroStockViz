@@ -59,7 +59,10 @@ NeuroStockViz/
 │   ├── home.html
 │   ├── index.html           # Neural correlation view
 │   └── minichart.html
-├──  report.pdf
+├── Document/              
+│   ├── NeuroStockViz-Visualizing-Stock-Correlations.pptx
+│   ├── report.pdf
+│   ├── Demo Video
 ├── app.py                   # Flask routes and backend logic
 ├── LICENSE
 ├── README.md                # Project documentation
