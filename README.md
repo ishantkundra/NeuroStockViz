@@ -62,7 +62,7 @@ NeuroStockViz/
 ├── Document/              
 │   ├── NeuroStockViz-Visualizing-Stock-Correlations.pptx
 │   ├── report.pdf
-│   ├── Demo Video.mov
+│   └── Demo Video.mov
 ├── app.py                   # Flask routes and backend logic
 ├── LICENSE
 ├── .gitattributes
